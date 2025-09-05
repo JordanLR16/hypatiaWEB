@@ -73,7 +73,7 @@ def worker(args):
 
 def help_dynamic_state(
         output_generated_data_dir, num_threads, name, time_step_ms, duration_s,
-        max_gsl_length_m, max_isl_length_m, dynamic_state_algorithm, print_logs
+        max_gsl_length_m, max_isl_length_m, dynamic_state_algorithm, print_logs, start_time=0
 ):
 
     # Directory
@@ -83,10 +83,11 @@ def help_dynamic_state(
         os.makedirs(output_dynamic_state_dir)
 
     # In nanoseconds
-    simulation_end_time_ns = duration_s * 1000 * 1000 * 1000
+    simulation_duration_ns = duration_s * 1000 * 1000 * 1000
+    simulation_start_time_ns = start_time * 1000 * 1000 * 1000
     time_step_ns = time_step_ms * 1000 * 1000
 
-    num_calculations = math.floor(simulation_end_time_ns / time_step_ns)
+    num_calculations = math.floor(simulation_duration_ns / time_step_ns)
     calculations_per_thread = int(math.floor(float(num_calculations) / float(num_threads)))
     num_threads_with_one_more = num_calculations % num_threads
 
@@ -122,9 +123,9 @@ def help_dynamic_state(
         list_args.append((
             output_dynamic_state_dir,
             epoch,
-            (current + num_time_steps) * time_step_ns + (time_step_ns if (i + 1) != num_threads else 0),
+            (current + num_time_steps) * time_step_ns + simulation_start_time_ns + (time_step_ns if (i + 1) != num_threads else 0),
             time_step_ns,
-            current * time_step_ns,
+            current * time_step_ns + simulation_start_time_ns,
             satellites,
             ground_stations,
             list_isls,

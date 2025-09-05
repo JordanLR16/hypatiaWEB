@@ -136,7 +136,8 @@ def generate_tles_from_scratch_manual(
         inclination_degree,
         eccentricity,
         arg_of_perigee_degree,
-        mean_motion_rev_per_day
+        mean_motion_rev_per_day,
+        start_time=0
 ):
 
     with open(filename_out, "w+") as f_out:
@@ -154,6 +155,7 @@ def generate_tles_from_scratch_manual(
         # <TLE line 1>
         # <TLE line 2>
         satellite_counter = 0
+        start_time_in_days = start_time // (24 * 3600)
         for orbit in range(0, num_orbits):
 
             # Orbit-dependent
@@ -169,8 +171,9 @@ def generate_tles_from_scratch_manual(
 
                 # Epoch is 2000-01-01 00:00:00, which is 00001 in ddyyy format
                 # See also: https://www.celestrak.com/columns/v04n03/#FAQ04
-                tle_line1 = "1 %05dU 00000ABC 00001.00000000  .00000000  00000-0  00000+0 0    0" % (
-                    satellite_counter + 1
+                tle_line1 = "1 %05dU 00000ABC %03d01.00000000  .00000000  00000-0  00000+0 0    0" % (
+                    satellite_counter + 1,
+                    start_time_in_days
                 )
 
                 tle_line2 = "2 %05d %s %s %s %s %s %s    0" % (
