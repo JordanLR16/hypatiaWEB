@@ -65,7 +65,8 @@ class MainHelper:
             isl_selection,            # isls_{none, plus_grid}
             gs_selection,             # ground_stations_{top_100, paris_moscow_grid}
             dynamic_state_algorithm,  # algorithm_{free_one_only_{gs_relays,_over_isls}, paired_many_only_over_isls}
-            num_threads
+            num_threads,
+            start_time=0
     ):
 
         # Add base name to setting
@@ -158,7 +159,8 @@ class MainHelper:
                 self.INCLINATION_DEGREE,
                 self.ECCENTRICITY,
                 self.ARG_OF_PERIGEE_DEGREE,
-                self.MEAN_MOTION_REV_PER_DAY
+                self.MEAN_MOTION_REV_PER_DAY,
+                start_time
             )
 
         # ISLs
@@ -220,5 +222,6 @@ class MainHelper:
             self.MAX_GSL_LENGTH_M,
             self.MAX_ISL_LENGTH_M,
             dynamic_state_algorithm,
-            True
+            True,
+            start_time
         )

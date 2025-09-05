@@ -54,8 +54,10 @@ MAX_GSL_LENGTH_M = math.sqrt(math.pow(SATELLITE_CONE_RADIUS_M, 2) + math.pow(ALT
 # ISLs are not allowed to dip below 80 km altitude in order to avoid weather conditions
 MAX_ISL_LENGTH_M = 2 * math.sqrt(math.pow(EARTH_RADIUS + ALTITUDE_M, 2) - math.pow(EARTH_RADIUS + 80000, 2))
 
-NUM_ORBS = 72
-NUM_SATS_PER_ORB = 22
+# NUM_ORBS = 72
+# NUM_SATS_PER_ORB = 22
+NUM_ORBS = 1 # zli85: only keep one satellite
+NUM_SATS_PER_ORB = 1 # zli85: only keep one satellite
 INCLINATION_DEGREE = 53
 
 ################################################################
@@ -79,13 +81,14 @@ main_helper = MainHelper(
 
 def main():
     args = sys.argv[1:]
-    if len(args) != 6:
+    if len(args) != 7:
         print("Must supply exactly six arguments")
-        print("Usage: python main_starlink_550.py [duration (s)] [time step (ms)] "
+        print("Usage: python main_kuiper_630.py [duration (s)] [time step (ms)] "
               "[isls_plus_grid / isls_none] "
               "[ground_stations_{top_100, paris_moscow_grid}] "
               "[algorithm_{free_one_only_over_isls, free_one_only_gs_relays, paired_many_only_over_isls}] "
-              "[num threads]")
+              "[num threads]"
+              "[start time in seconds]")
         exit(1)
     else:
         main_helper.calculate(
@@ -96,6 +99,7 @@ def main():
             args[3],
             args[4],
             int(args[5]),
+            int(args[6])
         )
 
 

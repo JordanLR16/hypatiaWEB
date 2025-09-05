@@ -22,6 +22,7 @@
 
 import json
 from satgen.distance_tools import *
+from satgen.sunlit_check import is_sunlit
 from astropy import units as u
 import math
 import networkx as nx
@@ -236,8 +237,10 @@ def generate_dynamic_state_at(
         sat.compute(str(time))
         sat_info[sat_idx] = {
             'latitude_degrees': math.degrees(sat.sublat),
-            'longitude_degrees': math.degrees(sat.sublong)
+            'longitude_degrees': math.degrees(sat.sublong),
+            'is_sunlit': 1 if is_sunlit(sat, str(time)) else 0 # check if the satellite is at the sunlit part of its orbit
         }
+        
 
     # record current ground-satellite connection state
 

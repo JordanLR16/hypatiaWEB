@@ -2,4 +2,4 @@
 # python main_sentinel2.py 3600 1000 isls_none ground_stations_top_100 algorithm_free_one_only_gs_relays 4
 # python main_sentinel2.py 432000 1000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
 # python main_sentinel2.py 86400 30000 isls_none ground_stations_top_100 algorithm_free_one_only_gs_relays 8
-python main_rapideye1.py 86400 30000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
+python main_rapideye1.py 86400 15000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
