@@ -1,0 +1,15 @@
+*
+!Dockerfile
+!.dockerignore
+!.gitattributes
+!README.md
+!LICENSE
+!hypatia_build.sh
+!ns3-sat-sim/
+!ns3-sat-sim/**
+!satgenpy/
+!satgenpy/**
+!satviz/
+!satviz/**
+!integration_tests/
+!integration_tests/**
