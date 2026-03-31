@@ -6,7 +6,7 @@ Hypatia is a low earth orbit (LEO) satellite network simulation framework. It pr
 <a href="#"><img alt="Telesat top-view" src="https://raw.githubusercontent.com/leosatsim/leosatsim.github.io/master/images/Telesat_top_view.png" width="20%" /></a>
 <a href="#"><img alt="starlink_paris_luanda_short" src="https://raw.githubusercontent.com/leosatsim/leosatsim.github.io/master/images/starlink_paris_luanda_short.png" width="10%" /></a>
 
-It consists of four main components:
+It consists of five main components:
 
 * `satgenpy` : Python framework to generate LEO satellite networks and generate 
   routing over time over a period of time. It additionally includes several 
@@ -39,8 +39,15 @@ It consists of four main components:
   It uses the gnuplot package for most of its plotting.
   More information can be found in `paper/README.md`.
   (license: MIT)
+
+* `backend` : Experimental backend scaffold for exposing parts of the Hypatia
+  workflow as a web service. It currently focuses on step-1 satellite network
+  state generation, with a FastAPI entrypoint, an in-memory job repository, and
+  parity tooling to compare backend-generated artifacts against the legacy
+  Manila-to-Dalian integration scenario.
+  More information can be found in `backend/README.md`.
   
-(there is a fifth folder called `integration_tests` which is used for integration testing purposes)
+(`integration_tests` is used for integration testing purposes)
 
 This is the code repository introduced and used in "Exploring the “Internet from space” with Hypatia" 
 by Simon Kassing*, Debopam Bhattacherjee*, André Baptista Águas, Jens Eirik Saethre and Ankit Singla
@@ -77,7 +84,13 @@ BibTeX citation:
    bash hypatia_run_tests.sh
    ```
 
-5. The reproduction of the paper is essentially the tutorial for Hypatia.
+5. To experiment with the backend scaffold and validate step-1 parity:
+   ```
+   python3 -m backend.scripts.verify_step1_parity
+   ```
+   More details are available in `backend/README.md`.
+
+6. The reproduction of the paper is essentially the tutorial for Hypatia.
    Please navigate to `paper/README.md`.
 
 ### Visualizations

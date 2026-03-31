@@ -54,9 +54,33 @@ class DynamicStateConfig(BaseModel):
     print_logs: bool = False
 
 
+class DynamicStateDefaultsConfig(BaseModel):
+    time_step_ms: int
+    duration_s: int
+    num_threads: int = 1
+    start_time_s: int = 0
+    print_logs: bool = False
+
+
 class DescriptionConfig(BaseModel):
     max_gsl_length_m: float
     max_isl_length_m: float
+
+
+class NetworkStateScenarioConfig(BaseModel):
+    base_name: str = Field(..., description="Base name for generated request directories.")
+    output_root: str = Field(default="generated", description="Root folder relative to the repo.")
+    name_template: str = Field(
+        default="{base_name}_{algorithm}",
+        description="Template used to generate request names.",
+    )
+    ground_stations: List[GroundStation]
+    description: DescriptionConfig
+    dynamic_state_defaults: DynamicStateDefaultsConfig
+    dynamic_state_algorithms: List[DynamicStateAlgorithm]
+    isl_config: IslConfig = Field(default_factory=IslConfig)
+    satellites: Optional[List[TleSatellite]] = None
+    manual_constellation: Optional[ManualConstellationConfig] = None
 
 
 class NetworkStateJobCreateRequest(BaseModel):

@@ -1,0 +1,99 @@
+Step 1 Backend Parity Handoff
+=============================
+
+This guide explains how to run the backend parity check for step 1
+("generate satellite networks state") in a fresh workspace.
+
+What this validates
+-------------------
+
+The parity script compares:
+
+1. Reference outputs generated with the legacy step-1 logic
+2. Backend outputs generated with the new NetworkStateService
+
+If the script succeeds, the backend is matching the current Manila/Dalian
+reduced-Kuiper step-1 scenario.
+
+Repository assumptions
+----------------------
+
+- You have a local checkout of this repository
+- Docker is installed on the host machine
+- You are running commands from the repository root
+
+Important note
+--------------
+
+Do not run `docker build` from inside the container shell.
+Run Docker commands from your host terminal.
+
+Build the image
+---------------
+
+From the repo root:
+
+    docker build -t hypatia-dev .
+
+If you already have an older container with the same name, remove it:
+
+    docker rm -f hypatia-test
+
+Start the container
+-------------------
+
+Windows PowerShell:
+
+    docker run --name hypatia-test -it -v "C:\path\to\your\hypatia:/workspace" hypatia-dev /bin/bash
+
+Example:
+
+    docker run --name hypatia-test -it -v "C:\Users\corey\hypatia:/workspace" hypatia-dev /bin/bash
+
+Run the parity check
+--------------------
+
+Inside the container:
+
+    cd /workspace
+    python3 -c "import pydantic; print(pydantic.__version__)"
+    python3 -m backend.scripts.verify_step1_parity
+
+Expected success output
+-----------------------
+
+You should see output similar to:
+
+    Generating reference outputs...
+    Generating backend outputs...
+    Comparing generated artifacts...
+    Parity check passed.
+
+If container name conflicts
+---------------------------
+
+If Docker says the container name is already in use:
+
+    docker rm -f hypatia-test
+
+Then start it again.
+
+If you are already inside the container
+---------------------------------------
+
+If you see a prompt like:
+
+    root@<container_id>:/workspace#
+
+you are already inside the container. Do not run `docker build` there.
+Open a host terminal if you need to rebuild the image.
+
+Relevant files
+--------------
+
+- backend/scripts/verify_step1_parity.py
+- backend/presets/manila_dalian_over_kuiper.py
+- backend/services/network_state_service.py
+- Dockerfile
+- backend/README.md
+
