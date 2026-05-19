@@ -14,8 +14,12 @@ rm -r ${NS3_VERSION} || exit 1
 cd simulator || exit 1
 
 # Update the basic-sim module
-echo "Updating git submodules"
-git submodule update || exit 1
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Updating git submodules"
+  git submodule update || exit 1
+else
+  echo "Skipping git submodule update because this is not a git checkout."
+fi
 
 # Configure the build
 if [ "$1" == "--debug_all" ]; then

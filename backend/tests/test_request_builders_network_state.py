@@ -1,5 +1,7 @@
 import unittest
 
+from pydantic import ValidationError
+
 from backend.domain.enums import DynamicStateAlgorithm, IslSelection
 from backend.domain.models import (
     DescriptionConfig,
@@ -110,22 +112,63 @@ class TestBuildNetworkStateRequestsFromScenario(unittest.TestCase):
         self.assertEqual(4, requests[0].manual_constellation.num_sats_per_orbit)
 
     def test_rejects_scenarios_without_satellites_or_manual_constellation(self) -> None:
-        scenario = NetworkStateScenarioConfig(
-            base_name="invalid_case",
-            ground_stations=[_build_ground_station()],
-            description=DescriptionConfig(
-                max_gsl_length_m=123.0,
-                max_isl_length_m=456.0,
-            ),
-            dynamic_state_defaults=DynamicStateDefaultsConfig(
-                time_step_ms=100,
-                duration_s=20,
-            ),
-            dynamic_state_algorithms=[DynamicStateAlgorithm.FREE_ONE_ONLY_GS_RELAYS],
-        )
-
         with self.assertRaisesRegex(
-            ValueError,
-            "requires either 'satellites' or 'manual_constellation'",
+            ValidationError,
+            "Provide exactly one of 'satellites' or 'manual_constellation'",
         ):
-            build_network_state_requests_from_scenario(scenario)
+            NetworkStateScenarioConfig(
+                base_name="invalid_case",
+                ground_stations=[_build_ground_station()],
+                description=DescriptionConfig(
+                    max_gsl_length_m=123.0,
+                    max_isl_length_m=456.0,
+                ),
+                dynamic_state_defaults=DynamicStateDefaultsConfig(
+                    time_step_ms=100,
+                    duration_s=20,
+                ),
+                dynamic_state_algorithms=[DynamicStateAlgorithm.FREE_ONE_ONLY_GS_RELAYS],
+            )
+
+    def test_rejects_scenarios_with_empty_algorithm_lists(self) -> None:
+        with self.assertRaises(ValidationError):
+            NetworkStateScenarioConfig(
+                base_name="invalid_case",
+                ground_stations=[_build_ground_station()],
+                description=DescriptionConfig(
+                    max_gsl_length_m=123.0,
+                    max_isl_length_m=456.0,
+                ),
+                dynamic_state_defaults=DynamicStateDefaultsConfig(
+                    time_step_ms=100,
+                    duration_s=20,
+                ),
+                dynamic_state_algorithms=[],
+                satellites=[_build_satellite()],
+            )
+
+    def test_rejects_unknown_name_template_tokens(self) -> None:
+        with self.assertRaisesRegex(
+            ValidationError,
+            "name_template may only reference 'base_name' and 'algorithm'",
+        ):
+            NetworkStateScenarioConfig(
+                base_name="invalid_case",
+                name_template="{base_name}_{unknown}",
+                ground_stations=[_build_ground_station()],
+                description=DescriptionConfig(
+                    max_gsl_length_m=123.0,
+                    max_isl_length_m=456.0,
+                ),
+                dynamic_state_defaults=DynamicStateDefaultsConfig(
+                    time_step_ms=100,
+                    duration_s=20,
+                ),
+                dynamic_state_algorithms=[DynamicStateAlgorithm.FREE_ONE_ONLY_GS_RELAYS],
+                satellites=[_build_satellite()],
+                isl_config=IslConfig(
+                    selection=IslSelection.PLUS_GRID,
+                    num_orbits=3,
+                    num_sats_per_orbit=4,
+                ),
+            )

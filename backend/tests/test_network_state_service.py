@@ -5,6 +5,8 @@ from uuid import uuid4
 from pathlib import Path
 from unittest.mock import patch
 
+from pydantic import ValidationError
+
 from backend.domain.enums import DynamicStateAlgorithm, IslSelection
 from backend.domain.models import (
     DescriptionConfig,
@@ -293,48 +295,38 @@ class TestNetworkStateService(unittest.TestCase):
         self.assertEqual(1, len(manual_calls))
 
     def test_generate_rejects_missing_orbit_counts_for_plus_grid_isls(self) -> None:
-        fake_satgen = _FakeSatgen()
-        with patch.dict(sys.modules, {"satgen": fake_satgen}):
-            service = NetworkStateService()
-
-        request = NetworkStateJobCreateRequest(
-            name="invalid_request",
-            output_root="generated",
-            ground_stations=[
-                GroundStation(
-                    gid=1,
-                    name="Station A",
-                    latitude_deg=10.0,
-                    longitude_deg=20.0,
-                    elevation_m=0.0,
-                )
-            ],
-            description=DescriptionConfig(
-                max_gsl_length_m=111.0,
-                max_isl_length_m=222.0,
-            ),
-            dynamic_state=DynamicStateConfig(
-                algorithm=DynamicStateAlgorithm.FREE_ONE_ONLY_OVER_ISLS,
-                time_step_ms=1000,
-                duration_s=30,
-            ),
-            isl_config=IslConfig(selection=IslSelection.PLUS_GRID),
-            satellites=[
-                TleSatellite(
-                    sid=0,
-                    name="InlineSat-0",
-                    tle_line1="1 00001U 00000ABC 00001.00000000  .00000000  00000-0  00000+0 0    01",
-                    tle_line2="2 00001  53.0000  42.0000 0000001   0.0000 142.9412 14.80000000    00",
-                )
-            ],
-        )
-
-        workspace = self._make_workspace("invalid")
-        try:
-            with self.assertRaisesRegex(
-                ValueError,
-                "ISL generation requires orbit counts",
-            ):
-                service.generate(request=request, workspace=workspace)
-        finally:
-            shutil.rmtree(workspace, ignore_errors=True)
+        with self.assertRaisesRegex(
+            ValidationError,
+            "PLUS_GRID ISL generation requires",
+        ):
+            NetworkStateJobCreateRequest(
+                name="invalid_request",
+                output_root="generated",
+                ground_stations=[
+                    GroundStation(
+                        gid=1,
+                        name="Station A",
+                        latitude_deg=10.0,
+                        longitude_deg=20.0,
+                        elevation_m=0.0,
+                    )
+                ],
+                description=DescriptionConfig(
+                    max_gsl_length_m=111.0,
+                    max_isl_length_m=222.0,
+                ),
+                dynamic_state=DynamicStateConfig(
+                    algorithm=DynamicStateAlgorithm.FREE_ONE_ONLY_OVER_ISLS,
+                    time_step_ms=1000,
+                    duration_s=30,
+                ),
+                isl_config=IslConfig(selection=IslSelection.PLUS_GRID),
+                satellites=[
+                    TleSatellite(
+                        sid=0,
+                        name="InlineSat-0",
+                        tle_line1="1 00001U 00000ABC 00001.00000000  .00000000  00000-0  00000+0 0    01",
+                        tle_line2="2 00001  53.0000  42.0000 0000001   0.0000 142.9412 14.80000000    00",
+                    )
+                ],
+            )
